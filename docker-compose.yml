@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  grc-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: grc-mcp-server
+    container_name: grc-mcp-server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - grc-data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  grc-data:
+    name: grc-mcp-data
